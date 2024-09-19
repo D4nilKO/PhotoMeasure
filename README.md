@@ -13,7 +13,10 @@ cd area-calculation-tool
 pip install -r requirements.txt 
 ``` 
 ## Запуск 
-Для запуска приложения выполните следующую команду:  ```bash python Calculate_Area_New.py
+Для запуска приложения выполните следующую команду:  
+```bash
+python Calculate_Area_New.py
+``` 
 
 ## Использование
 
