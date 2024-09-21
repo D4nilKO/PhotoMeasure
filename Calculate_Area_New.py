@@ -149,30 +149,13 @@ class AreaCalculatorApp:
         self.result_label.config(text=f"Площадь объекта: {total_area_cm2:.2f} см^2")
 
     def apply_hatching(self, image, mask):
-        pattern_size = 10
-        color = (255, 0, 0)
-        thickness = 1
-
-        hatching_image = np.zeros_like(image)
-
-        if self.inverted:
-            mask = ~mask
-
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        for contour in contours:
-            contour_mask = np.zeros_like(mask)
-            cv2.drawContours(contour_mask, [contour], -1, 255, thickness=cv2.FILLED)
-
-            for y in range(0, contour_mask.shape[0], pattern_size):
-                for x in range(0, contour_mask.shape[1], pattern_size):
-                    if contour_mask[y, x] == 255:
-                        start_point = (x, y)
-                        end_point = (min(x + pattern_size, contour_mask.shape[1]), min(y + pattern_size, contour_mask.shape[0]))
-                        cv2.line(hatching_image, start_point, end_point, color, thickness)
-
-        mask = mask.astype(bool)
-        image[mask] = np.where(hatching_image[mask] == 0, image[mask], hatching_image[mask])
+        pattern_size = 10  # Размер штриховки
+        thickness = 1  # Толщина линий штриховки
+        for y in range(0, image.shape[0], pattern_size):
+            for x in range(0, image.shape[1], pattern_size):
+                # Проверяем не только центр области, но и окрестности на соответствие маске
+                if np.mean(mask[y:y + pattern_size, x:x + pattern_size]) > 200:  # Учитываем небольшие расхождения
+                    cv2.line(image, (x, y), (x + pattern_size, y + pattern_size), (255, 0, 0), thickness)
 
     def invert_area(self):
         self.inverted = not self.inverted
